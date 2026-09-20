@@ -1,6 +1,6 @@
 # Grupo_RASI
 Trabalho avaliativo referente ao 3º Bimestre da matéria RASI do ano de  2026 
-
+Grupo: Gabriel Rizzo, Melissa e Mariah.
 
 PRÉ-REQUISITO: Instalar o Docker antes de começar.
 
