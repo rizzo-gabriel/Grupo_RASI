@@ -2,184 +2,181 @@
 Trabalho avaliativo referente ao 3º Bimestre da matéria RASI do ano de  2026 
 
 
-PARTE A — Configurando a rede
-1. Configurando o modo Bridge
+PRÉ-REQUISITO: Instalar o Docker antes de começar.
 
-Primeiramente, configure a placa de rede da máquina virtual em modo Bridge.
+# 1. Configure a máquina virtual em modo Bridge. Nas configurações de rede, habilite a placa de rede, selecione “Placa em modo Bridge”, escolha a placa de rede utilizada pelo computador e deixe “Virtual Cable Connected” ativado.
 
-Na configuração da placa de rede:
+# 2. Inicie o Linux e abra o terminal.
 
-Ligado a: Placa em modo Bridge
-Nome: Realtek PCIe GbE Family Controller
-Tipo de Placa: Intel PRO/1000 MT Desktop (82540EM)
-Promiscuous Mode: Recusar
-Virtual Cable Connected: ativado
-2. Descobrindo o próprio IP
-
-Abra o terminal e execute:
+# 3. Descubra o endereço IP da máquina utilizando o comando:
 
 hostname -I
 
-O resultado apresentado foi:
+# 4. Anote o endereço IP apresentado. No trabalho, foi utilizado o IP 10.125.131.156.
 
-10.125.131.156 172.17.0.1
+# 5. A partir da máquina hospedeira, conecte-se ao servidor utilizando o endereço IP encontrado. Na primeira conexão, confirme com “yes” quando solicitado e depois informe a senha.
 
-Utilize o endereço:
-
-10.125.131.156
-3. Conectando ao servidor da máquina hospedeira
-
-No computador hospedeiro, abra o terminal e execute:
-
-ssh aluno@10.125.131.156
-
-Quando aparecer a pergunta:
-
-Are you sure you want to continue connecting (yes/no/[fingerprint])?
-
-Digite:
-
-yes
-
-Em seguida, informe a senha do usuário.
-
-Após a autenticação, a conexão com o servidor será estabelecida.
-
-PARTE B — Docker
-4. Atualizando o sistema
-
-No terminal, execute:
+# 6. Atualize os pacotes do sistema utilizando:
 
 sudo apt update
 
-Aguarde a atualização dos pacotes.
+# 7. Verifique a versão do Docker com:
 
-5. Verificando a versão do Docker
+docker --version
 
-Execute:
-
-docker -version
-
-O terminal apresentará a versão ou as informações relacionadas ao Docker.
-
-6. Testando o Docker
-
-Execute:
+# 8. Teste o funcionamento do Docker com:
 
 docker run hello-world
 
-O Docker iniciará o container de teste e apresentará a mensagem:
-
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-
-PARTE C — Criando o projeto Flask
-7. Instalando a biblioteca tree
-
-Execute:
+# 9. Instale a biblioteca tree:
 
 sudo apt install tree
-8. Criando a pasta do projeto
 
-Crie a pasta principal:
+# 10. Crie a pasta principal do projeto:
 
 mkdir projeto-flask
 
-Depois, crie a pasta da aplicação:
+# 11. Crie a pasta app:
 
 mkdir projeto-flask/app
-9. Criando os arquivos
 
-Crie o Dockerfile:
+# 12. Crie o Dockerfile:
 
 touch projeto-flask/Dockerfile
 
-Crie o arquivo da aplicação Flask:
+# 13. Crie o arquivo app.py:
 
 touch projeto-flask/app/app.py
 
-Crie o arquivo de dependências:
+# 14. Crie o arquivo requirements.txt:
 
 touch projeto-flask/app/requirements.txt
 
-A estrutura do projeto ficará:
+# 15. Visualize a estrutura criada com:
 
-projeto-flask/
-├── Dockerfile
-└── app/
-    ├── app.py
-    └── requirements.txt
+tree projeto-flask/
 
-10. Configurando o Dockerfile
-
-Abra o arquivo Dockerfile e escreva:
-
-FROM python:3.14-slim
-WORKDIR /app
-COPY app/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY app/ .
-EXPOSE 5000
-CMD ["python", "app.py"]
-
-Salve o arquivo.
-
-11. Construindo a imagem
-
-Entre na pasta do projeto:
+# 16. Entre na pasta do projeto:
 
 cd projeto-flask
 
-Depois execute:
+# 17. Abra o Dockerfile:
+
+nano Dockerfile
+
+# 18. Dentro do Dockerfile, coloque:
+
+FROM python:3.14-slim
+
+WORKDIR /app
+
+COPY app/requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app/ .
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+
+# 19. Salve o Dockerfile e saia do editor.
+
+# 20. Entre na pasta app:
+
+cd app
+
+# 21. Abra o arquivo app.py:
+
+nano app.py
+
+# 22. No arquivo app.py, coloque:
+
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def inicio():
+    return """
+    <h1>Bem-vindo ao Flask!</h1>
+    <p>Esta é a página inicial.</p>
+
+    <a href="/sobre">Sobre</a>
+    <a href="/contato">Contato</a>
+    """
+
+@app.route("/sobre")
+def sobre():
+    return """
+    <h1>Sobre</h1>
+    <p>Este site foi feito com Python e Flask.</p>
+
+    <a href="/">Início</a>
+    <a href="/contato">Contato</a>
+    """
+
+@app.route("/contato")
+def contato():
+    return """
+    <h1>Contato</h1>
+    <p>Email: contato@exemplo.com</p>
+
+    <a href="/">Início</a>
+    <a href="/sobre">Sobre</a>
+    """
+
+app.run(host="0.0.0.0", port=5000)
+
+# 23. Salve o arquivo app.py e saia do editor.
+
+# 24. Abra o arquivo requirements.txt:
+
+nano requirements.txt
+
+# 25. Coloque dentro dele:
+
+flask
+
+# 26. Salve o arquivo e saia do editor.
+
+# 27. Volte para a pasta principal do projeto:
+
+cd ..
+
+# 28. Construa a imagem Docker com:
 
 docker build -t flask-app .
 
-A imagem flask-app será construída a partir do Dockerfile.
-
-12. Mapeando a porta
-
-Execute:
+# 29. Execute o container e faça o mapeamento da porta:
 
 docker run -d -p 5000:5000 --name meu-flask flask-app
 
-O Docker iniciará o container utilizando a porta 5000.
-
-13. Acessando a aplicação Flask
-
-Abra o navegador e acesse:
-
-10.125.131.156:5000
-
-A aplicação Flask será exibida no navegador com a mensagem:
-
-Minha primeira aplicação Flask
-
-Aplicação executando dentro de um container Docker
-
-14. Verificando o container
-
-No terminal, execute:
+# 30. Verifique se o container está funcionando:
 
 docker ps
 
-O comando exibirá os containers em execução e o mapeamento da porta:
-
-0.0.0.0:5000->5000/tcp
-15. Verificando os logs do Flask
-
-Execute:
+# 31. Verifique os logs do container:
 
 docker logs meu-flask
 
-Os logs mostrarão a execução do Flask:
+# 32. Confira novamente o endereço IP da máquina com:
 
-* Serving Flask app 'app'
-* Debug mode: off
-* Running on all addresses (0.0.0.0)
-* Running on http://127.0.0.1:5000
-* Running on http://172.17.0.2:5000
+hostname -I
 
-Também serão registrados os acessos realizados pelo navegador:
+# 33. Abra um navegador em uma máquina conectada à mesma rede.
 
-GET / HTTP/1.1 200
-GET /favicon.ico HTTP/1.1 404
+# 34. Digite o endereço utilizando o IP da máquina e a porta 5000. No caso do trabalho:
+
+http://10.125.131.156:5000
+
+# 35. Para acessar a página “Sobre”, utilize:
+
+http://10.125.131.156:5000/sobre
+
+# 36. Para acessar a página “Contato”, utilize:
+
+http://10.125.131.156:5000/contato
+
+Ao final, o projeto estará funcionando com Flask dentro de um container Docker. A aplicação poderá ser acessada pelo navegador utilizando o IP da máquina e a porta 5000, e as diferentes páginas poderão ser acessadas pelas rotas /, /sobre e /contato.
+
